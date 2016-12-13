@@ -13,8 +13,8 @@
 %endif
 
 Name:       python-sphinx
-Version:    1.4.8
-Release:    3%{?dist}
+Version:    1.4.9
+Release:    1%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -26,7 +26,7 @@ Group:      Development/Tools
 License:    BSD and Public Domain and Python and (MIT or GPLv2)
 URL:        http://sphinx-doc.org/
 Source0:    https://files.pythonhosted.org/packages/source/S/%{upstream_name}/%{upstream_name}-%{version}.tar.gz
-Patch0:     Sphinx-1.2.1-mantarget.patch
+#Patch0:     Sphinx-1.2.1-mantarget.patch
 
 BuildArch:     noarch
 BuildRequires: python2-devel >= 2.4
@@ -87,7 +87,7 @@ BuildRequires: tex(luatex85.sty)
 
 %if 0%{?with_python3}
 BuildRequires: python3-devel
-#BuildRequires: python3-babel
+BuildRequires: python3-babel
 BuildRequires: python3-setuptools
 BuildRequires: python3-docutils
 BuildRequires: python3-jinja2
@@ -415,7 +415,7 @@ popd
 LANG=en_US.UTF-8 make test
 %if 0%{?with_python3}
 pushd %{py3dir}
-#LANG=en_US.UTF-8 PYTHON=python3 make test
+LANG=en_US.UTF-8 PYTHON=python3 make test
 popd
 %endif # with_python3
 
@@ -527,6 +527,10 @@ fi
 
 
 %changelog
+* Tue Dec 13 2016 Charalampos Stratakis <cstratak@redhat.com> - 1.4.9-1
+- Update to 1.4.9
+- Enable python3 tests
+
 * Mon Dec 12 2016 Charalampos Stratakis <cstratak@redhat.com> - 1.4.8-3
 - Rebuild for Python 3.6
 - Disable python3 tests for now
