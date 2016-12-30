@@ -1,0 +1,6 @@
+#%Module 1.0
+#
+#  python2-sphinx module for use with 'environment modules' package
+#
+conflict        python-sphinx
+prepend-path    PATH            @python3_sphinx_dir@
