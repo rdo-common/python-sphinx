@@ -60,6 +60,8 @@ BuildRequires: texinfo
 BuildRequires: graphviz
 BuildRequires: python-sqlalchemy
 BuildRequires: python2-mock
+BuildRequires: python2-simplejson
+BuildRequires: python-html5lib
 BuildRequires: python-whoosh
 BuildRequires: python2-snowballstemmer
 # note: no Python3 xapian binding yet
@@ -105,6 +107,8 @@ BuildRequires: python3-pygments
 BuildRequires: python3-nose
 BuildRequires: python3-sqlalchemy
 BuildRequires: python3-mock
+BuildRequires: python3-simplejson
+BuildRequires: python3-html5lib
 BuildRequires: python3-whoosh
 BuildRequires: python3-snowballstemmer
 BuildRequires: python3-six
