@@ -14,8 +14,8 @@
 %global upstream_name Sphinx
 
 Name:       python-sphinx
-Version:    1.4.9
-Release:    2%{?dist}
+Version:    1.5.1
+Release:    1%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -32,6 +32,9 @@ Source2:    python3-sphinx
 Source3:    zz-modules-python-sphinx.sh
 Source4:    zz-modules-python-sphinx.csh
 #Patch0:     Sphinx-1.2.1-mantarget.patch
+# Upstream fix for xapian 1.4
+# https://github.com/sphinx-doc/sphinx/commit/cf795894b9290c5ab2035ae21535f0a7f4b7107a
+Patch1:     python-sphinx-xapian.patch
 
 BuildArch:     noarch
 BuildRequires: python2-devel >= 2.4
@@ -531,6 +534,9 @@ popd
 
 
 %changelog
+* Fri Dec 30 2016 Orion Poplawski <orion@cora.nwra.com> - 1.5.1-1
+- Update to 1.5.1
+
 * Fri Dec 30 2016 Toshio Kuratomi <toshio@fedoraproject.org> - 1.4.9-2
 - Remove alternatives.  Alternatives should only be used for a very small
   number of packages (system daemons which also have a compatible command line
