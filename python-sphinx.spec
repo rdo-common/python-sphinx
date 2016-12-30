@@ -47,6 +47,7 @@ BuildRequires: python-six
 BuildRequires: python2-sphinx_rtd_theme
 BuildRequires: python2-sphinx-theme-alabaster
 BuildRequires: python2-imagesize
+BuildRequires: python2-requests
 BuildRequires: environment(modules)
 
 # for fixes
@@ -110,6 +111,7 @@ BuildRequires: python3-six
 BuildRequires: python3-sphinx_rtd_theme
 BuildRequires: python3-sphinx-theme-alabaster
 BuildRequires: python3-imagesize
+BuildRequires: python3-requests
 %endif # with_python3
 
 
@@ -155,6 +157,7 @@ Requires:      python2-sphinx_rtd_theme
 Requires:      python2-six
 Requires:      python2-sphinx-theme-alabaster
 Requires:      python2-imagesize
+Requires:      python2-requests
 Requires(posttrans): Lmod
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
@@ -259,6 +262,7 @@ Requires:      python3-snowballstemmer
 Requires:      python3-sphinx_rtd_theme
 Requires:      python3-sphinx-theme-alabaster
 Requires:      python3-imagesize
+Requires:      python3-requests
 Requires:      python3-six
 Recommends:    graphviz
 Requires(posttrans): Lmod
