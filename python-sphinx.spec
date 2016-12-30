@@ -4,17 +4,18 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 %endif
 
-%global upstream_name Sphinx
-
-%if 0%{?fedora} > 24
-%global py3_alt_priority 500
+# At some point, RHEL will need to be in here too
+%if 0%{?fedora} && 0%{?fedora} > 24
+%global py3_default 1
 %else
-%global py3_alt_priority 10
+%global py3_default 0
 %endif
+
+%global upstream_name Sphinx
 
 Name:       python-sphinx
 Version:    1.4.9
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -26,6 +27,10 @@ Group:      Development/Tools
 License:    BSD and Public Domain and Python and (MIT or GPLv2)
 URL:        http://sphinx-doc.org/
 Source0:    https://files.pythonhosted.org/packages/source/S/%{upstream_name}/%{upstream_name}-%{version}.tar.gz
+Source1:    python2-sphinx
+Source2:    python3-sphinx
+Source3:    zz-modules-python-sphinx.sh
+Source4:    zz-modules-python-sphinx.csh
 #Patch0:     Sphinx-1.2.1-mantarget.patch
 
 BuildArch:     noarch
@@ -39,6 +44,7 @@ BuildRequires: python-six
 BuildRequires: python2-sphinx_rtd_theme
 BuildRequires: python2-sphinx-theme-alabaster
 BuildRequires: python2-imagesize
+BuildRequires: environment(modules)
 
 # for fixes
 BuildRequires: dos2unix
@@ -146,9 +152,11 @@ Requires:      python2-sphinx_rtd_theme
 Requires:      python2-six
 Requires:      python2-sphinx-theme-alabaster
 Requires:      python2-imagesize
+Requires(posttrans): Lmod
+# Needed to get rid of the alternatives config installed in f24 and f25
+# versions of the package
+Requires(posttrans): /usr/sbin/alternatives
 Recommends:    graphviz
-Requires(post): %{_sbindir}/update-alternatives
-Requires(postun): %{_sbindir}/update-alternatives
 Obsoletes:     python-sphinx <= 1.2.3
 Obsoletes:     python-sphinxcontrib-napoleon < 0.5
 Provides:      python-sphinxcontrib-napoleon = %{version}-%{release}
@@ -250,8 +258,10 @@ Requires:      python3-sphinx-theme-alabaster
 Requires:      python3-imagesize
 Requires:      python3-six
 Recommends:    graphviz
-Requires(post): %{_sbindir}/update-alternatives
-Requires(postun): %{_sbindir}/update-alternatives
+Requires(posttrans): Lmod
+# Needed to get rid of the alternatives config installed in f24 and f25
+# versions of the package
+Requires(posttrans): /usr/sbin/alternatives
 Obsoletes:     python3-sphinxcontrib-napoleon < 0.3.0
 Provides:      python3-sphinxcontrib-napoleon = %{version}-%{release}
 Provides:      python(Sphinx) = %{version}-%{release}
@@ -352,20 +362,20 @@ popd
 %install
 %if 0%{?with_python3}
 %py3_install
+install -d %{buildroot}%{_libexecdir}/python3-sphinx
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
     mv %{buildroot}%{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python3_version}
     ln -s $i-%{python3_version} %{buildroot}%{_bindir}/$i-3
+    ln -s %{_bindir}/$i-3 %{buildroot}%{_libexecdir}/python3-sphinx/$i
 done
 %endif # with_python3
 
 %py2_install
+install -d %{buildroot}%{_libexecdir}/python2-sphinx
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
     mv %{buildroot}%{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python2_version}
     ln -s $i-%{python2_version} %{buildroot}%{_bindir}/$i-2
-done
-
-for i in sphinx-{apidoc,autogen,build,quickstart}; do
-    touch %{buildroot}%{_bindir}/$i
+    ln -s %{_bindir}/$i-2 %{buildroot}%{_libexecdir}/python2-sphinx/$i
 done
 
 pushd doc
@@ -373,6 +383,9 @@ pushd doc
 install -d %{buildroot}%{_mandir}/man1
 for f in _build/man/sphinx-*.1;
 do
+    ### TODO: these are all the same.  Do we really need to ship them three
+    ### times or is it fine to just ship them as e.g. sphinx-build.1
+    cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f)
     cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f | sed -e "s|.1$|-%{python2_version}.1|")
     cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f | sed -e "s|.1$|-%{python3_version}.1|")
 done
@@ -402,6 +415,38 @@ do
   rm -rf sphinx/locale/$lang
 done
 popd
+
+install -d %{buildroot}%{_modulesdir}/python-sphinx
+install -m 0644 %{SOURCE1} %{buildroot}%{_modulesdir}/python-sphinx/
+sed -i 's|@python2_sphinx_dir@|%{_libexecdir}/python2-sphinx|' %{buildroot}%{_modulesdir}/python-sphinx/python2-sphinx
+install -m 0644 %{SOURCE2} %{buildroot}%{_modulesdir}/python-sphinx/
+sed -i 's|@python3_sphinx_dir@|%{_libexecdir}/python3-sphinx|' %{buildroot}%{_modulesdir}/python-sphinx/python3-sphinx
+install -d %{buildroot}%{_sysconfdir}/profile.d
+install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
+install -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
+
+%if %{py3_default}
+ln -s python3-sphinx %{buildroot}%{_modulesdir}/python-sphinx/default
+
+# These symlinks establish a default for when a package is first installed (and
+# therefore, environment modules is not loaded).  The user can immediately
+# switch them by using module swap python-sphinx/python2-sphinx
+for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
+ln -s %{_libexecdir}/python3-sphinx/$filename %{buildroot}%{_bindir}/$filename
+done
+
+%else
+ln -s python2-sphinx %{buildroot}%{_modulesdir}/python-sphinx/default
+
+# These symlinks establish a default for when a package is first installed (and
+# therefore, environment modules is not loaded).  The user can immediately
+# switch them by using module swap python-sphinx/python3-sphinx
+for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
+ln -s %{_libexecdir}/python2-sphinx/$filename %{buildroot}%{_bindir}/$filename
+done
+
+%endif
+
 %find_lang sphinx
 
 # Language files; Since these are javascript, it's not immediately obvious to
@@ -419,61 +464,19 @@ LANG=en_US.UTF-8 PYTHON=python3 make test
 popd
 %endif # with_python3
 
-%post -n python2-sphinx
 
-# Remove old versions of files so alternatives doesn't break
-for filename in %{_mandir}/man1/sphinx-{all,apidoc,build,quickstart}.1.gz %{_bindir}/sphinx-{build,apidoc,autogen,quickstart}
-do
-    if [ ! -L $filename ]
-    then
-        rm -f $filename
-    fi
-done
-
-%{_sbindir}/update-alternatives --install %{_bindir}/sphinx-build \
-  sphinx-build %{_bindir}/sphinx-build-%{python2_version} 100 \
-  --slave %{_bindir}/sphinx-apidoc sphinx-apidoc %{_bindir}/sphinx-apidoc-%{python2_version} \
-  --slave %{_bindir}/sphinx-autogen sphinx-autogen %{_bindir}/sphinx-autogen-%{python2_version} \
-  --slave %{_bindir}/sphinx-quickstart sphinx-quickstart %{_bindir}/sphinx-quickstart-%{python2_version} \
-  --slave %{_mandir}/man1/sphinx-all.1.gz sphinx-all.1.gz %{_mandir}/man1/sphinx-all-%{python2_version}.1.gz \
-  --slave %{_mandir}/man1/sphinx-apidoc.1.gz sphinx-apidoc.1.gz %{_mandir}/man1/sphinx-apidoc-%{python2_version}.1.gz \
-  --slave %{_mandir}/man1/sphinx-build.1.gz sphinx-build.1.gz %{_mandir}/man1/sphinx-build-%{python2_version}.1.gz \
-  --slave %{_mandir}/man1/sphinx-quickstart.1.gz sphinx-quickstart.1.gz %{_mandir}/man1/sphinx-quickstart-%{python2_version}.1.gz
+%pre -n python2-sphinx
+# python-sphinx as shipped in an update to f24 and f25 used alternatives.  So
+# we need to clean up the alternatives configuration until at least f27
+%{_sbindir}/update-alternatives --remove sphinx-build %{_bindir}/sphinx-build-%{python2_version} || :
 
 %if 0%{?with_python3}
-%post -n python3-sphinx
-
-# Remove old versions of files so alternatives doesn't break
-for filename in %{_mandir}/man1/sphinx-{all,apidoc,build,quickstart}.1.gz %{_bindir}/sphinx-{build,apidoc,autogen,quickstart}
-do
-    if [ ! -L $filename ]
-    then
-        rm -f $filename
-    fi
-done
-
-%{_sbindir}/update-alternatives --install %{_bindir}/sphinx-build \
-  sphinx-build %{_bindir}/sphinx-build-%{python3_version} %{py3_alt_priority} \
-  --slave %{_bindir}/sphinx-apidoc sphinx-apidoc %{_bindir}/sphinx-apidoc-%{python3_version} \
-  --slave %{_bindir}/sphinx-autogen sphinx-autogen %{_bindir}/sphinx-autogen-%{python3_version} \
-  --slave %{_bindir}/sphinx-quickstart sphinx-quickstart %{_bindir}/sphinx-quickstart-%{python3_version} \
-  --slave %{_mandir}/man1/sphinx-all.1.gz sphinx-all.1.gz %{_mandir}/man1/sphinx-all-%{python3_version}.1.gz \
-  --slave %{_mandir}/man1/sphinx-apidoc.1.gz sphinx-apidoc.1.gz %{_mandir}/man1/sphinx-apidoc-%{python3_version}.1.gz \
-  --slave %{_mandir}/man1/sphinx-build.1.gz sphinx-build.1.gz %{_mandir}/man1/sphinx-build-%{python3_version}.1.gz \
-  --slave %{_mandir}/man1/sphinx-quickstart.1.gz sphinx-quickstart.1.gz %{_mandir}/man1/sphinx-quickstart-%{python3_version}.1.gz
+%pre -n python3-sphinx
+# python-sphinx as shipped in an update to f24 and f25 used alternatives.  So
+# we need to clean up the alternatives configuration until at least f27
+%{_sbindir}/update-alternatives --remove sphinx-build %{_bindir}/sphinx-build-%{python3_version} || :
 %endif # with_python3
 
-%postun -n python2-sphinx
-if [ $1 -eq 0 ] ; then
-  %{_sbindir}/update-alternatives --remove sphinx-build %{_bindir}/sphinx-build-%{python2_version}
-fi
-
-%if 0%{?with_python3}
-%postun -n python3-sphinx
-if [ $1 -eq 0 ] ; then
-  %{_sbindir}/update-alternatives --remove sphinx-build %{_bindir}/sphinx-build-%{python3_version}
-fi
-%endif # with_python3
 
 %files latex
 %license LICENSE
@@ -492,33 +495,34 @@ fi
 %{python2_sitelib}/Sphinx-%{version}-py%{python2_version}.egg-info/
 %exclude %{_mandir}/man1/sphinx-*-%{python3_version}.1*
 %{_mandir}/man1/*
+%{_libexecdir}/python2-sphinx/
+%{_modulesdir}/python-sphinx/python2-sphinx
+%if !%{py3_default}
+%{_modulesdir}/python-sphinx/default
+%endif
+%{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
+%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
 
-%ghost %{_bindir}/sphinx-apidoc
-%ghost %{_bindir}/sphinx-autogen
-%ghost %{_bindir}/sphinx-build
-%ghost %{_bindir}/sphinx-quickstart
-%ghost %{_mandir}/man1/sphinx-all.1.gz
-%ghost %{_mandir}/man1/sphinx-apidoc.1.gz
-%ghost %{_mandir}/man1/sphinx-build.1.gz
-%ghost %{_mandir}/man1/sphinx-quickstart.1.gz
 %if 0%{?with_python3}
 
 %files -n python3-sphinx
 %license LICENSE
 %doc AUTHORS CHANGES EXAMPLES README.rst
 %{_bindir}/sphinx-*-3*
+%{_bindir}/sphinx-build
+%{_bindir}/sphinx-apidoc
+%{_bindir}/sphinx-autogen
+%{_bindir}/sphinx-quickstart
 %{python3_sitelib}/sphinx/
 %{python3_sitelib}/Sphinx-%{version}-py%{python3_version}.egg-info/
 %{_mandir}/man1/sphinx-*-%{python3_version}.1*
-
-%ghost %{_bindir}/sphinx-apidoc
-%ghost %{_bindir}/sphinx-autogen
-%ghost %{_bindir}/sphinx-build
-%ghost %{_bindir}/sphinx-quickstart
-%ghost %{_mandir}/man1/sphinx-all.1.gz
-%ghost %{_mandir}/man1/sphinx-apidoc.1.gz
-%ghost %{_mandir}/man1/sphinx-build.1.gz
-%ghost %{_mandir}/man1/sphinx-quickstart.1.gz
+%{_libexecdir}/python3-sphinx/
+%{_modulesdir}/python-sphinx/python3-sphinx
+%if %{py3_default}
+%{_modulesdir}/python-sphinx/default
+%endif
+%{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
+%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
 
 %endif # with_python3
 
@@ -527,6 +531,14 @@ fi
 
 
 %changelog
+* Fri Dec 30 2016 Toshio Kuratomi <toshio@fedoraproject.org> - 1.4.9-2
+- Remove alternatives.  Alternatives should only be used for a very small
+  number of packages (system daemons which also have a compatible command line
+  interface).
+- Use environment-modules to switch between the python2 and python3 packages
+  *but* be aware that no amount of manual switching can get this 100% right.
+  The code has to be fixed upstream, not in packaging.
+
 * Tue Dec 13 2016 Charalampos Stratakis <cstratak@redhat.com> - 1.4.9-1
 - Update to 1.4.9
 - Enable python3 tests
