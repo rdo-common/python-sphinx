@@ -99,6 +99,7 @@ BuildRequires: tex(luatex85.sty)
 BuildRequires: tex(fncychap.sty)
 BuildRequires: tex(tabulary.sty)
 BuildRequires: tex(polyglossia.sty)
+BuildRequires: tex(eu1enc.def)
 
 %if 0%{?with_python3}
 BuildRequires: python3-devel
@@ -244,6 +245,7 @@ Requires:      tex(luatex85.sty)
 Requires:      tex(fncychap.sty)
 Requires:      tex(tabulary.sty)
 Requires:      tex(polyglossia.sty)
+Requires:      tex(eu1enc.def)
 Obsoletes:     python3-sphinx-latex < 1.4.4-2
 
 %description latex
