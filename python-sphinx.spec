@@ -96,6 +96,9 @@ BuildRequires: tex(eqparbox.sty)
 BuildRequires: tex(atbegshi.sty)
 BuildRequires: tex(anyfontsize.sty)
 BuildRequires: tex(luatex85.sty)
+BuildRequires: tex(fncychp.sty)
+BuildRequires: tex(tabulary.sty)
+BuildRequires: tex(polyglossia.sty)
 
 %if 0%{?with_python3}
 BuildRequires: python3-devel
@@ -238,6 +241,9 @@ Requires:      tex(eqparbox.sty)
 Requires:      tex(atbegshi.sty)
 Requires:      tex(anyfontsize.sty)
 Requires:      tex(luatex85.sty)
+Requires:      tex(fncychp.sty)
+Requires:      tex(tabulary.sty)
+Requires:      tex(polyglossia.sty)
 Obsoletes:     python3-sphinx-latex < 1.4.4-2
 
 %description latex
