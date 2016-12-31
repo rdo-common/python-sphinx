@@ -406,6 +406,12 @@ done
 find %{buildroot}%{python3_sitelib}/sphinx/locale -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -exec rm -rf '{}' \;
 popd
 
+# Clean up non-python files
+rm -f %{buildroot}%{python2_sitelib}/sphinx/locale/.DS_Store
+rm -rf %{buildroot}%{python2_sitelib}/sphinx/locale/.tx
+rm -f %{buildroot}%{python3_sitelib}/sphinx/locale/.DS_Store
+rm -rf %{buildroot}%{python3_sitelib}/sphinx/locale/.tx
+
 # Deliver rst files
 rm -rf doc/_build
 sed -i 's|python ../sphinx-build.py|/usr/bin/sphinx-build|' doc/Makefile
@@ -511,8 +517,8 @@ popd
 %if !%{py3_default}
 %{_modulesdir}/python-sphinx/default
 %endif
-%{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
-%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
+%config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
+%config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
 
 %if 0%{?with_python3}
 
@@ -532,8 +538,8 @@ popd
 %if %{py3_default}
 %{_modulesdir}/python-sphinx/default
 %endif
-%{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
-%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
+%config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
+%config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
 
 %endif # with_python3
 
