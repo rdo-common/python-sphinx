@@ -480,9 +480,15 @@ done
 
 
 %check
+# Currently, all linkcheck tests hit external websites.  Since network access
+# is disabled in koji, we have to disable these.
+rm tests/test_build_linkcheck.py
 LANG=en_US.UTF-8 make test
 %if 0%{?with_python3}
 pushd %{py3dir}
+# Currently, all linkcheck tests hit external websites.  Since network access
+# is disabled in koji, we have to disable these.
+rm tests/test_build_linkcheck.py
 LANG=en_US.UTF-8 PYTHON=python3 make test
 popd
 %endif # with_python3
