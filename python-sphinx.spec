@@ -15,7 +15,7 @@
 
 Name:       python-sphinx
 Version:    1.5.1
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -524,6 +524,10 @@ popd
 %license LICENSE
 %doc AUTHORS CHANGES EXAMPLES README.rst README.fedora
 %{_bindir}/sphinx-*-2*
+%{_bindir}/sphinx-build
+%{_bindir}/sphinx-apidoc
+%{_bindir}/sphinx-autogen
+%{_bindir}/sphinx-quickstart
 %{python2_sitelib}/sphinx/
 %{python2_sitelib}/Sphinx-%{version}-py%{python2_version}.egg-info/
 %exclude %{_mandir}/man1/sphinx-*-%{python3_version}.1*
@@ -542,10 +546,6 @@ popd
 %license LICENSE
 %doc AUTHORS CHANGES EXAMPLES README.rst README.fedora
 %{_bindir}/sphinx-*-3*
-%{_bindir}/sphinx-build
-%{_bindir}/sphinx-apidoc
-%{_bindir}/sphinx-autogen
-%{_bindir}/sphinx-quickstart
 %{python3_sitelib}/sphinx/
 %{python3_sitelib}/Sphinx-%{version}-py%{python3_version}.egg-info/
 %{_mandir}/man1/sphinx-*-%{python3_version}.1*
@@ -564,6 +564,10 @@ popd
 
 
 %changelog
+* Wed Jan 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-3
+- Move the unversioned executables into the python2 package as they are now
+  using python2 to run
+
 * Wed Jan 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-2
 - Add README.fedora so people know how to use environment-modules to switch.
 - Change the default to be the python2 version to match with the guidelines
