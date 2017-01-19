@@ -4,18 +4,18 @@
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 %endif
 
-# At some point, RHEL will need to be in here too
-%if 0%{?fedora} && 0%{?fedora} > 24
-%global py3_default 1
-%else
+# Currently, python2 version is always the default: https://fedoraproject.org/wiki/Packaging:Python#Naming
+%if 1
 %global py3_default 0
+%else
+%global py3_default 1
 %endif
 
 %global upstream_name Sphinx
 
 Name:       python-sphinx
 Version:    1.5.1
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -31,6 +31,7 @@ Source1:    python2-sphinx
 Source2:    python3-sphinx
 Source3:    zz-modules-python-sphinx.sh
 Source4:    zz-modules-python-sphinx.csh
+Source5:    README.fedora
 #Patch0:     Sphinx-1.2.1-mantarget.patch
 # Upstream fix for xapian 1.4
 # https://github.com/sphinx-doc/sphinx/commit/cf795894b9290c5ab2035ae21535f0a7f4b7107a
@@ -166,10 +167,10 @@ Requires:      python2-six
 Requires:      python2-sphinx-theme-alabaster
 Requires:      python2-imagesize
 Requires:      python2-requests
-Requires(posttrans): Lmod
+Requires: environment(modules)
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
-Requires(posttrans): /usr/sbin/alternatives
+Requires(pre): /usr/sbin/alternatives
 Recommends:    graphviz
 Obsoletes:     python-sphinx <= 1.2.3
 Obsoletes:     python-sphinxcontrib-napoleon < 0.5
@@ -277,16 +278,15 @@ Requires:      python3-imagesize
 Requires:      python3-requests
 Requires:      python3-six
 Recommends:    graphviz
-Requires(posttrans): Lmod
+Requires: environment(modules)
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
-Requires(posttrans): /usr/sbin/alternatives
+Requires(pre): /usr/sbin/alternatives
 Obsoletes:     python3-sphinxcontrib-napoleon < 0.3.0
 Provides:      python3-sphinxcontrib-napoleon = %{version}-%{release}
 Provides:      python(Sphinx) = %{version}-%{release}
 %{?python_provide:%python_provide python3-sphinx}
 Conflicts:     python2-Sphinx < %{version}-%{release}
-Conflicts:     python2-sphinx < %{version}-%{release}
 
 %description -n python3-sphinx
 Sphinx is a tool that makes it easy to create intelligent and
@@ -352,6 +352,8 @@ This package contains locale files for Sphinx
 
 %prep
 %autosetup -n %{upstream_name}-%{version}%{?prerel} -p1
+
+cp %{SOURCE5} .
 
 sed '1d' -i sphinx/pycode/pgen2/token.py
 
@@ -457,7 +459,7 @@ ln -s python3-sphinx %{buildroot}%{_modulesdir}/python-sphinx/default
 # therefore, environment modules is not loaded).  The user can immediately
 # switch them by using module swap python-sphinx/python2-sphinx
 for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
-ln -s %{_libexecdir}/python3-sphinx/$filename %{buildroot}%{_bindir}/$filename
+  ln -s %{_libexecdir}/python3-sphinx/$filename %{buildroot}%{_bindir}/$filename
 done
 
 %else
@@ -467,7 +469,7 @@ ln -s python2-sphinx %{buildroot}%{_modulesdir}/python-sphinx/default
 # therefore, environment modules is not loaded).  The user can immediately
 # switch them by using module swap python-sphinx/python3-sphinx
 for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
-ln -s %{_libexecdir}/python2-sphinx/$filename %{buildroot}%{_bindir}/$filename
+  ln -s %{_libexecdir}/python2-sphinx/$filename %{buildroot}%{_bindir}/$filename
 done
 
 %endif
@@ -520,7 +522,7 @@ popd
 
 %files -n python2-sphinx
 %license LICENSE
-%doc AUTHORS CHANGES EXAMPLES README.rst
+%doc AUTHORS CHANGES EXAMPLES README.rst README.fedora
 %{_bindir}/sphinx-*-2*
 %{python2_sitelib}/sphinx/
 %{python2_sitelib}/Sphinx-%{version}-py%{python2_version}.egg-info/
@@ -538,7 +540,7 @@ popd
 
 %files -n python3-sphinx
 %license LICENSE
-%doc AUTHORS CHANGES EXAMPLES README.rst
+%doc AUTHORS CHANGES EXAMPLES README.rst README.fedora
 %{_bindir}/sphinx-*-3*
 %{_bindir}/sphinx-build
 %{_bindir}/sphinx-apidoc
@@ -562,6 +564,11 @@ popd
 
 
 %changelog
+* Wed Jan 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-2
+- Add README.fedora so people know how to use environment-modules to switch.
+- Change the default to be the python2 version to match with the guidelines
+- Switch to generic environment(modules) instead of Lmod specifically.
+
 * Fri Dec 30 2016 Orion Poplawski <orion@cora.nwra.com> - 1.5.1-1
 - Update to 1.5.1
 
