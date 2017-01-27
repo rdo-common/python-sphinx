@@ -15,7 +15,7 @@
 
 Name:       python-sphinx
 Version:    1.5.1
-Release:    3%{?dist}
+Release:    4%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -564,6 +564,9 @@ popd
 
 
 %changelog
+* Thu Jan 26 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-4
+- Add recipe for setting the system default to the README.fedora
+
 * Wed Jan 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-3
 - Move the unversioned executables into the python2 package as they are now
   using python2 to run

@@ -14,4 +14,14 @@ To switch to the Python2 version, use::
 
     module swap python-sphinx/python2-sphinx
 
-The default install uses the python3 version of the modules.
+The default install uses the python2 version of the modules.
+If the system administrator wishes to change the default, edit the
+/etc/profile.d/zz-modules-python-sphinx.sh and
+/etc/profile.d/zz-modules-python-sphinx.csh files to specify a specific
+alternative to use.  For instance, to make the python3 version the default,
+modify it like so::
+
+    @@ -1,2 +1,2 @@
+     # Add path to the default python-sphinx scripts on this version of Fedora
+    -module load python-sphinx
+    +module load python-sphinx/python3-sphinx
