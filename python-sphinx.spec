@@ -15,7 +15,7 @@
 
 Name:       python-sphinx
 Version:    1.5.1
-Release:    4%{?dist}
+Release:    5%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -32,6 +32,9 @@ Source2:    python3-sphinx
 Source3:    zz-modules-python-sphinx.sh
 Source4:    zz-modules-python-sphinx.csh
 Source5:    README.fedora
+# environment-modules file to select whether the py2 or py3 version of
+# python-sphinx execuitables is default
+Source6:    default-sphinx-command.in
 #Patch0:     Sphinx-1.2.1-mantarget.patch
 # Upstream fix for xapian 1.4
 # https://github.com/sphinx-doc/sphinx/commit/cf795894b9290c5ab2035ae21535f0a7f4b7107a
@@ -453,7 +456,7 @@ install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/profile.d/zz-modules-pytho
 install -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
 
 %if %{py3_default}
-ln -s python3-sphinx %{buildroot}%{_modulesdir}/python-sphinx/default
+sed 's/@PYTHONVER@/3/' < %{SOURCE6} > %{buildroot}%{_modulesdir}/python-sphinx/.version
 
 # These symlinks establish a default for when a package is first installed (and
 # therefore, environment modules is not loaded).  The user can immediately
@@ -463,7 +466,7 @@ for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
 done
 
 %else
-ln -s python2-sphinx %{buildroot}%{_modulesdir}/python-sphinx/default
+sed 's/@PYTHONVER@/2/' < %{SOURCE6} > %{buildroot}%{_modulesdir}/python-sphinx/.version
 
 # These symlinks establish a default for when a package is first installed (and
 # therefore, environment modules is not loaded).  The user can immediately
@@ -535,7 +538,7 @@ popd
 %{_libexecdir}/python2-sphinx/
 %{_modulesdir}/python-sphinx/python2-sphinx
 %if !%{py3_default}
-%{_modulesdir}/python-sphinx/default
+%{_modulesdir}/python-sphinx/.version
 %endif
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
@@ -552,7 +555,7 @@ popd
 %{_libexecdir}/python3-sphinx/
 %{_modulesdir}/python-sphinx/python3-sphinx
 %if %{py3_default}
-%{_modulesdir}/python-sphinx/default
+%{_modulesdir}/python-sphinx/.version
 %endif
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
@@ -564,6 +567,15 @@ popd
 
 
 %changelog
+* Tue Jan 31 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-5
+- environment-modules is less featureful than Lmod.
+  - Select the default version in a different way since environment-modules
+    didn't understand the symlink
+  - Ignore error messsages in the shell startup script as environment-modules
+    prints an error message if a module has already been loaded.  The command
+    is doing the right thing for this case except that it's also printing an
+    error message.
+
 * Thu Jan 26 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.1-4
 - Add recipe for setting the system default to the README.fedora
 
