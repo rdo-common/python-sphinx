@@ -14,8 +14,8 @@
 %global upstream_name Sphinx
 
 Name:       python-sphinx
-Version:    1.5.1
-Release:    6%{?dist}
+Version:    1.5.2
+Release:    1%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -77,7 +77,6 @@ BuildRequires: texlive-dvisvgm
 BuildRequires: texlive-ucs
 BuildRequires: tex(cmap.sty)
 BuildRequires: tex(ecrm1000.tfm)
-BuildRequires: tex(fancybox.sty)
 BuildRequires: tex(footnote.sty)
 BuildRequires: tex(framed.sty)
 BuildRequires: tex(multirow.sty)
@@ -223,7 +222,6 @@ Requires:      texlive-dvisvgm
 Requires:      texlive-ucs
 Requires:      tex(cmap.sty)
 Requires:      tex(ecrm1000.tfm)
-Requires:      tex(fancybox.sty)
 Requires:      tex(footnote.sty)
 Requires:      tex(framed.sty)
 Requires:      tex(multirow.sty)
@@ -567,6 +565,10 @@ popd
 
 
 %changelog
+* Fri Feb 17 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-1
+- Update to 1.5.2
+- Remove a few latex dependencies that are no longer needed
+
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
 
