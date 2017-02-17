@@ -35,10 +35,6 @@ Source5:    README.fedora
 # environment-modules file to select whether the py2 or py3 version of
 # python-sphinx execuitables is default
 Source6:    default-sphinx-command.in
-#Patch0:     Sphinx-1.2.1-mantarget.patch
-# Upstream fix for xapian 1.4
-# https://github.com/sphinx-doc/sphinx/commit/cf795894b9290c5ab2035ae21535f0a7f4b7107a
-Patch1:     python-sphinx-xapian.patch
 
 BuildArch:     noarch
 BuildRequires: python2-devel >= 2.4
@@ -568,6 +564,7 @@ popd
 * Fri Feb 17 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-1
 - Update to 1.5.2
 - Remove a few latex dependencies that are no longer needed
+- Remove xapian patch; now in upstream tarball
 
 * Sat Feb 11 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.5.1-6
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_26_Mass_Rebuild
