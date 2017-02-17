@@ -55,6 +55,8 @@ BuildRequires: dos2unix
 
 # for testing
 BuildRequires: python-nose
+BuildRequires: python2-pytest
+BuildRequires: python-pytest-cov
 BuildRequires: gettext
 BuildRequires: texinfo
 BuildRequires: graphviz
@@ -64,6 +66,7 @@ BuildRequires: python2-simplejson
 BuildRequires: python-html5lib
 BuildRequires: python-whoosh
 BuildRequires: python2-snowballstemmer
+BuildRequires: python-enum34
 # note: no Python3 xapian binding yet
 BuildRequires: xapian-bindings-python
 BuildRequires: texlive-collection-fontsrecommended
@@ -108,6 +111,8 @@ BuildRequires: python3-docutils
 BuildRequires: python3-jinja2
 BuildRequires: python3-pygments
 BuildRequires: python3-nose
+BuildRequires: python3-pytest
+BuildRequires: python3-pytest-cov
 BuildRequires: python3-sqlalchemy
 BuildRequires: python3-mock
 BuildRequires: python3-simplejson
