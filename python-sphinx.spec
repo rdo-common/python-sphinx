@@ -400,7 +400,7 @@ done
 # built by setup.py yet.  Removing them in %%install so that if sphinx does
 # make use of them, and we don't notice, we only remove these source files
 # after the build has created the .so's
-rm %{builddir}%{python3_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
+rm %{buildroot}%{python3_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
 %endif # with_python3
 
 %py2_install
@@ -415,7 +415,7 @@ done
 # built by setup.py yet.  Removing them in %%install so that if sphinx does
 # make use of them, and we don't notice, we only remove these source files
 # after the build has created the .so's
-rm %{builddir}%{python2_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
+rm %{buildroot}%{python2_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
 
 pushd doc
 # Deliver man pages
