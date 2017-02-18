@@ -15,7 +15,7 @@
 
 Name:       python-sphinx
 Version:    1.5.2
-Release:    1%{?dist}
+Release:    2%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -362,6 +362,10 @@ sed '1d' -i sphinx/pycode/pgen2/token.py
 # fix line encoding of bundled jquery.js
 dos2unix -k ./sphinx/themes/basic/static/jquery.js
 
+# In 1.5.2, the upstream tarball left this .pyc by mistake.
+# Remove it so that it doesn't get included in the python3 build by mistake
+rm sphinx/locale/__init__.pyc
+
 %if 0%{?with_python3}
 rm -rf %{py3dir}
 cp -a . %{py3dir}
@@ -391,6 +395,12 @@ for i in sphinx-{apidoc,autogen,build,quickstart}; do
     ln -s $i-%{python3_version} %{buildroot}%{_bindir}/$i-3
     ln -s %{_bindir}/$i-3 %{buildroot}%{_libexecdir}/python3-sphinx/$i
 done
+
+# These appear to be incomplete C extensions to speed up parsing.  They are not
+# built by setup.py yet.  Removing them in %%install so that if sphinx does
+# make use of them, and we don't notice, we only remove these source files
+# after the build has created the .so's
+rm %{builddir}%{python3_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
 %endif # with_python3
 
 %py2_install
@@ -400,6 +410,12 @@ for i in sphinx-{apidoc,autogen,build,quickstart}; do
     ln -s $i-%{python2_version} %{buildroot}%{_bindir}/$i-2
     ln -s %{_bindir}/$i-2 %{buildroot}%{_libexecdir}/python2-sphinx/$i
 done
+
+# These appear to be incomplete C extensions to speed up parsing.  They are not
+# built by setup.py yet.  Removing them in %%install so that if sphinx does
+# make use of them, and we don't notice, we only remove these source files
+# after the build has created the .so's
+rm %{builddir}%{python2_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
 
 pushd doc
 # Deliver man pages
@@ -566,6 +582,10 @@ popd
 
 
 %changelog
+* Sat Feb 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-2
+- Cleanup source files that should not be installed
+- Fix the __init__.pyc that was byte compiled for the wrong python
+
 * Fri Feb 17 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-1
 - Update to 1.5.2
 - Remove a few latex dependencies that are no longer needed
