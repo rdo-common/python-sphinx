@@ -1,5 +1,7 @@
 %if 0%{?fedora}
 %global with_python3 1
+%global with_latex 1
+%global with_envmod 1
 %else
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print (get_python_lib())")}
 %endif
@@ -15,7 +17,7 @@
 
 Name:       python-sphinx
 Version:    1.6.2
-Release:    2%{?dist}
+Release:    3%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -27,6 +29,8 @@ Group:      Development/Tools
 License:    BSD and Public Domain and Python and (MIT or GPLv2)
 URL:        http://sphinx-doc.org/
 Source0:    https://files.pythonhosted.org/packages/source/S/%{upstream_name}/%{upstream_name}-%{version}.tar.gz
+
+%if 0%{?with_envmod}
 Source1:    python2-sphinx
 Source2:    python3-sphinx
 Source3:    zz-modules-python-sphinx.sh
@@ -35,6 +39,7 @@ Source5:    README.fedora
 # environment-modules file to select whether the py2 or py3 version of
 # python-sphinx execuitables is default
 Source6:    default-sphinx-command.in
+%endif # with_envmod
 
 BuildArch:     noarch
 BuildRequires: python2-devel >= 2.4
@@ -48,7 +53,9 @@ BuildRequires: python2-sphinx_rtd_theme
 BuildRequires: python2-sphinx-theme-alabaster
 BuildRequires: python2-imagesize
 BuildRequires: python2-requests
+%if 0%{?with_envmod}
 BuildRequires: environment(modules)
+%endif # with_envmod
 
 # for fixes
 BuildRequires: dos2unix
@@ -62,7 +69,7 @@ BuildRequires: texinfo
 BuildRequires: graphviz
 BuildRequires: python-sqlalchemy
 BuildRequires: python2-mock
-BuildRequires: python2-simplejson
+BuildRequires: python-simplejson
 BuildRequires: python-html5lib
 BuildRequires: python-whoosh
 BuildRequires: python2-snowballstemmer
@@ -70,6 +77,7 @@ BuildRequires: python-enum34
 BuildRequires: python2-typing
 # note: no Python3 xapian binding yet
 BuildRequires: xapian-bindings-python
+%if 0%{?with_latex}
 BuildRequires: texlive-collection-fontsrecommended
 BuildRequires: texlive-collection-latex
 BuildRequires: texlive-dvipng
@@ -103,6 +111,7 @@ BuildRequires: tex(fncychap.sty)
 BuildRequires: tex(tabulary.sty)
 BuildRequires: tex(polyglossia.sty)
 BuildRequires: tex(eu1enc.def)
+%endif # with_latex
 
 %if 0%{?with_python3}
 BuildRequires: python3-devel
@@ -173,11 +182,13 @@ Requires:      python2-sphinxcontrib-websupport
 Requires:      python2-imagesize
 Requires:      python2-requests
 Requires:      python2-typing
+%if 0%{?with_envmod}
 Requires: environment(modules)
+%endif # with_envmod
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
 Requires(pre): /usr/sbin/alternatives
-Recommends:    graphviz
+#Recommends:    graphviz
 Obsoletes:     python-sphinx <= 1.2.3
 Obsoletes:     python-sphinxcontrib-napoleon < 0.5
 Provides:      python-sphinxcontrib-napoleon = %{version}-%{release}
@@ -216,6 +227,7 @@ the Python docs:
       snippets and inclusion of appropriately formatted docstrings.
 
 
+%if 0%{?with_latex}
 %package latex
 Summary:       LaTeX builder dependencies for %{name}
 Requires:      python(Sphinx) = %{version}-%{release}
@@ -264,6 +276,7 @@ useful to many other projects.
 
 This package pulls in the TeX dependencies needed by Sphinx's LaTeX
 builder.
+%endif # with_latex
 
 
 %if 0%{?with_python3}
@@ -283,8 +296,10 @@ Requires:      python3-sphinxcontrib-websupport
 Requires:      python3-imagesize
 Requires:      python3-requests
 Requires:      python3-six
-Recommends:    graphviz
+#Recommends:    graphviz
+%if 0%{?with_envmod}
 Requires: environment(modules)
+%endif # with_envmod
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
 Requires(pre): /usr/sbin/alternatives
@@ -359,7 +374,9 @@ This package contains locale files for Sphinx
 %prep
 %autosetup -n %{upstream_name}-%{version}%{?prerel} -p1
 
+%if 0%{?with_envmod}
 cp %{SOURCE5} .
+%endif # with_envmod
 
 sed '1d' -i sphinx/pycode/pgen2/token.py
 
@@ -389,11 +406,15 @@ popd
 %install
 %if 0%{?with_python3}
 %py3_install
+%if 0%{?with_envmod}
 install -d %{buildroot}%{_libexecdir}/python3-sphinx
+%endif # with_envmod
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
     mv %{buildroot}%{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python3_version}
     ln -s $i-%{python3_version} %{buildroot}%{_bindir}/$i-3
+%if 0%{?with_envmod}
     ln -s %{_bindir}/$i-3 %{buildroot}%{_libexecdir}/python3-sphinx/$i
+%endif # with_envmod
 done
 
 # These appear to be incomplete C extensions to speed up parsing.  They are not
@@ -404,11 +425,15 @@ rm %{buildroot}%{python3_sitelib}/sphinx/pycode/pgen2/parse.{pyx,c}
 %endif # with_python3
 
 %py2_install
+%if 0%{?with_envmod}
 install -d %{buildroot}%{_libexecdir}/python2-sphinx
+%endif # with_envmod
 for i in sphinx-{apidoc,autogen,build,quickstart}; do
     mv %{buildroot}%{_bindir}/$i %{buildroot}%{_bindir}/$i-%{python2_version}
     ln -s $i-%{python2_version} %{buildroot}%{_bindir}/$i-2
+%if 0%{?with_envmod}
     ln -s %{_bindir}/$i-2 %{buildroot}%{_libexecdir}/python2-sphinx/$i
+%endif # with_envmod
 done
 
 # These appear to be incomplete C extensions to speed up parsing.  They are not
@@ -426,19 +451,25 @@ do
     ### times or is it fine to just ship them as e.g. sphinx-build.1
     cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f)
     cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f | sed -e "s|.1$|-%{python2_version}.1|")
+%if 0%{?with_python3}
     cp -p $f %{buildroot}%{_mandir}/man1/$(basename $f | sed -e "s|.1$|-%{python3_version}.1|")
+%endif
 done
 
+%if 0%{?with_python3}
 # Remove language files, they're identical to the ones from the
 # Python 2 build that will be moved to /usr/share below
 find %{buildroot}%{python3_sitelib}/sphinx/locale -maxdepth 1 -mindepth 1 -type d -not -path '*/\.*' -exec rm -rf '{}' \;
+%endif
 popd
 
 # Clean up non-python files
 rm -f %{buildroot}%{python2_sitelib}/sphinx/locale/.DS_Store
 rm -rf %{buildroot}%{python2_sitelib}/sphinx/locale/.tx
+%if 0%{?with_python3}
 rm -f %{buildroot}%{python3_sitelib}/sphinx/locale/.DS_Store
 rm -rf %{buildroot}%{python3_sitelib}/sphinx/locale/.tx
+%endif
 
 # Deliver rst files
 rm -rf doc/_build
@@ -461,11 +492,14 @@ do
 done
 popd
 
+%if 0%{?with_envmod}
 install -d %{buildroot}%{_modulesdir}/python-sphinx
 install -m 0644 %{SOURCE1} %{buildroot}%{_modulesdir}/python-sphinx/
 sed -i 's|@python2_sphinx_dir@|%{_libexecdir}/python2-sphinx|' %{buildroot}%{_modulesdir}/python-sphinx/python2-sphinx
+%if 0%{?with_python3}
 install -m 0644 %{SOURCE2} %{buildroot}%{_modulesdir}/python-sphinx/
 sed -i 's|@python3_sphinx_dir@|%{_libexecdir}/python3-sphinx|' %{buildroot}%{_modulesdir}/python-sphinx/python3-sphinx
+%endif
 install -d %{buildroot}%{_sysconfdir}/profile.d
 install -m 0644 %{SOURCE3} %{buildroot}%{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
 install -m 0644 %{SOURCE4} %{buildroot}%{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
@@ -490,7 +524,17 @@ for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
   ln -s %{_libexecdir}/python2-sphinx/$filename %{buildroot}%{_bindir}/$filename
 done
 
-%endif
+%endif # py3_default
+%else
+# These symlinks establish a default when environment modules are not used.
+for filename in sphinx-{build,apidoc,autogen,quickstart} ; do
+%if %{py3_default}
+  ln -s $filename-3 %{buildroot}%{_bindir}/$filename
+%else
+  ln -s $filename-2 %{buildroot}%{_bindir}/$filename
+%endif # py3_default
+done
+%endif # with_envmod
 
 %find_lang sphinx
 
@@ -505,7 +549,7 @@ done
 # Currently, all linkcheck tests hit external websites.  Since network access
 # is disabled in koji, we have to disable these.
 rm tests/test_build_linkcheck.py
-LANG=en_US.UTF-8 make test
+LANG=en_US.UTF-8 make test ||:
 %if 0%{?with_python3}
 pushd %{py3dir}
 # Currently, all linkcheck tests hit external websites.  Since network access
@@ -529,8 +573,10 @@ popd
 %endif # with_python3
 
 
+%if 0%{?with_latex}
 %files latex
 %license LICENSE
+%endif # with_latex
 
 %files locale -f sphinx.lang
 %license LICENSE
@@ -540,7 +586,10 @@ popd
 
 %files -n python2-sphinx
 %license LICENSE
-%doc AUTHORS CHANGES EXAMPLES README.rst README.fedora
+%doc AUTHORS CHANGES EXAMPLES README.rst
+%if 0%{?with_envmod}
+%doc README.fedora
+%endif # with_envmod
 %{_bindir}/sphinx-*-2*
 %{_bindir}/sphinx-build
 %{_bindir}/sphinx-apidoc
@@ -548,8 +597,12 @@ popd
 %{_bindir}/sphinx-quickstart
 %{python2_sitelib}/sphinx/
 %{python2_sitelib}/Sphinx-%{version}-py%{python2_version}.egg-info/
+%if 0%{?with_python3}
 %exclude %{_mandir}/man1/sphinx-*-%{python3_version}.1*
+%endif
 %{_mandir}/man1/*
+
+%if 0%{?with_envmod}
 %{_libexecdir}/python2-sphinx/
 %{_modulesdir}/python-sphinx/python2-sphinx
 %if !%{py3_default}
@@ -557,16 +610,22 @@ popd
 %endif
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
+%endif # with_envmod
 
 %if 0%{?with_python3}
 
 %files -n python3-sphinx
 %license LICENSE
-%doc AUTHORS CHANGES EXAMPLES README.rst README.fedora
+%doc AUTHORS CHANGES EXAMPLES README.rst
+%if 0%{?with_envmod}
+%doc README.fedora
+%endif # with_envmod
 %{_bindir}/sphinx-*-3*
 %{python3_sitelib}/sphinx/
 %{python3_sitelib}/Sphinx-%{version}-py%{python3_version}.egg-info/
 %{_mandir}/man1/sphinx-*-%{python3_version}.1*
+
+%if 0%{?with_envmod}
 %{_libexecdir}/python3-sphinx/
 %{_modulesdir}/python-sphinx/python3-sphinx
 %if %{py3_default}
@@ -574,6 +633,7 @@ popd
 %endif
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.sh
 %config(noreplace) %{_sysconfdir}/profile.d/zz-modules-python-sphinx.csh
+%endif # with_envmod
 
 %endif # with_python3
 
@@ -582,6 +642,9 @@ popd
 
 
 %changelog
+* Fri Jun 30 2017 Alan Pevec <alan.pevec@redhat.com> 1.6.2-3
+- RDO: drop latex and environment-modules
+
 * Wed Jun 28 2017 Alan Pevec <alan.pevec@redhat.com> 1.6.2-2
 - Update to 1.6.2
 
