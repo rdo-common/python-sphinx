@@ -76,6 +76,7 @@ BuildRequires: python-whoosh
 BuildRequires: python2-snowballstemmer
 BuildRequires: python-enum34
 BuildRequires: ImageMagick
+BuildRequires: python2-typing
 # note: no Python3 xapian binding yet
 BuildRequires: xapian-bindings-python
 BuildRequires: texlive-collection-fontsrecommended
@@ -179,6 +180,7 @@ Requires:      python2-snowballstemmer
 Requires:      python2-sphinx_rtd_theme
 Requires:      python2-six
 Requires:      python2-sphinx-theme-alabaster
+Requires:      python2-sphinxcontrib-websupport
 Requires:      python2-imagesize
 Requires:      python2-requests
 Requires:      python2-typing
@@ -291,6 +293,7 @@ Requires:      python3-mock
 Requires:      python3-snowballstemmer
 Requires:      python3-sphinx_rtd_theme
 Requires:      python3-sphinx-theme-alabaster
+Requires:      python3-sphinxcontrib-websupport
 Requires:      python3-imagesize
 Requires:      python3-requests
 Requires:      python3-six
@@ -612,6 +615,9 @@ popd
 
 * Thu Jul 20 2017 Charalampos Stratakis <cstratak@redhat.com> - - 1.6.3-1
 - Update to 1.6.3 (bz#1426928)
+
+* Wed Jun 28 2017 Alan Pevec <alan.pevec@redhat.com> 1.6.2-2
+- Update to 1.6.2
 
 * Sat Feb 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-2
 - Cleanup source files that should not be installed
