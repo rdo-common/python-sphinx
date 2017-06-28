@@ -14,7 +14,7 @@
 %global upstream_name Sphinx
 
 Name:       python-sphinx
-Version:    1.5.2
+Version:    1.6.2
 Release:    2%{?dist}
 Summary:    Python documentation generator
 
@@ -67,6 +67,7 @@ BuildRequires: python-html5lib
 BuildRequires: python-whoosh
 BuildRequires: python2-snowballstemmer
 BuildRequires: python-enum34
+BuildRequires: python2-typing
 # note: no Python3 xapian binding yet
 BuildRequires: xapian-bindings-python
 BuildRequires: texlive-collection-fontsrecommended
@@ -168,8 +169,10 @@ Requires:      python2-snowballstemmer
 Requires:      python2-sphinx_rtd_theme
 Requires:      python2-six
 Requires:      python2-sphinx-theme-alabaster
+Requires:      python2-sphinxcontrib-websupport
 Requires:      python2-imagesize
 Requires:      python2-requests
+Requires:      python2-typing
 Requires: environment(modules)
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
@@ -276,6 +279,7 @@ Requires:      python3-mock
 Requires:      python3-snowballstemmer
 Requires:      python3-sphinx_rtd_theme
 Requires:      python3-sphinx-theme-alabaster
+Requires:      python3-sphinxcontrib-websupport
 Requires:      python3-imagesize
 Requires:      python3-requests
 Requires:      python3-six
@@ -361,10 +365,6 @@ sed '1d' -i sphinx/pycode/pgen2/token.py
 
 # fix line encoding of bundled jquery.js
 dos2unix -k ./sphinx/themes/basic/static/jquery.js
-
-# In 1.5.2, the upstream tarball left this .pyc by mistake.
-# Remove it so that it doesn't get included in the python3 build by mistake
-rm sphinx/locale/__init__.pyc
 
 %if 0%{?with_python3}
 rm -rf %{py3dir}
@@ -582,6 +582,9 @@ popd
 
 
 %changelog
+* Wed Jun 28 2017 Alan Pevec <alan.pevec@redhat.com> 1.6.2-2
+- Update to 1.6.2
+
 * Sat Feb 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-2
 - Cleanup source files that should not be installed
 - Fix the __init__.pyc that was byte compiled for the wrong python
