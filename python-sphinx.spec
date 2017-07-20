@@ -14,8 +14,8 @@
 %global upstream_name Sphinx
 
 Name:       python-sphinx
-Version:    1.5.2
-Release:    2%{?dist}
+Version:    1.6.3
+Release:    1%{?dist}
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -36,6 +36,11 @@ Source5:    README.fedora
 # python-sphinx execuitables is default
 Source6:    default-sphinx-command.in
 
+# Make the test_latex_remote_images an expected failure
+# since it requires an active internet connection
+# to fetch images, which is not possible in koji or mock.
+Patch0: xfail-test_latex_remote_images.patch
+
 BuildArch:     noarch
 BuildRequires: python2-devel >= 2.4
 BuildRequires: python2-babel
@@ -48,6 +53,8 @@ BuildRequires: python2-sphinx_rtd_theme
 BuildRequires: python2-sphinx-theme-alabaster
 BuildRequires: python2-imagesize
 BuildRequires: python2-requests
+BuildRequires: python2-typing
+BuildRequires: python2-sphinxcontrib-websupport
 BuildRequires: environment(modules)
 
 # for fixes
@@ -67,6 +74,7 @@ BuildRequires: python-html5lib
 BuildRequires: python-whoosh
 BuildRequires: python2-snowballstemmer
 BuildRequires: python-enum34
+BuildRequires: ImageMagick
 # note: no Python3 xapian binding yet
 BuildRequires: xapian-bindings-python
 BuildRequires: texlive-collection-fontsrecommended
@@ -101,6 +109,7 @@ BuildRequires: tex(luatex85.sty)
 BuildRequires: tex(fncychap.sty)
 BuildRequires: tex(tabulary.sty)
 BuildRequires: tex(polyglossia.sty)
+BuildRequires: tex(ctablestack.sty)
 BuildRequires: tex(eu1enc.def)
 
 %if 0%{?with_python3}
@@ -124,6 +133,7 @@ BuildRequires: python3-sphinx_rtd_theme
 BuildRequires: python3-sphinx-theme-alabaster
 BuildRequires: python3-imagesize
 BuildRequires: python3-requests
+BuildRequires: python3-sphinxcontrib-websupport
 %endif # with_python3
 
 
@@ -170,11 +180,14 @@ Requires:      python2-six
 Requires:      python2-sphinx-theme-alabaster
 Requires:      python2-imagesize
 Requires:      python2-requests
+Requires:      python2-typing
+Requires:      python2-sphinxcontrib-websupport
 Requires: environment(modules)
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
 Requires(pre): /usr/sbin/alternatives
 Recommends:    graphviz
+Recommends:    ImageMagick
 Obsoletes:     python-sphinx <= 1.2.3
 Obsoletes:     python-sphinxcontrib-napoleon < 0.5
 Provides:      python-sphinxcontrib-napoleon = %{version}-%{release}
@@ -248,6 +261,7 @@ Requires:      tex(luatex85.sty)
 Requires:      tex(fncychap.sty)
 Requires:      tex(tabulary.sty)
 Requires:      tex(polyglossia.sty)
+Requires:      tex(ctablestack.sty)
 Requires:      tex(eu1enc.def)
 Obsoletes:     python3-sphinx-latex < 1.4.4-2
 
@@ -279,7 +293,9 @@ Requires:      python3-sphinx-theme-alabaster
 Requires:      python3-imagesize
 Requires:      python3-requests
 Requires:      python3-six
+Requires:      python3-sphinxcontrib-websupport
 Recommends:    graphviz
+Recommends:    ImageMagick
 Requires: environment(modules)
 # Needed to get rid of the alternatives config installed in f24 and f25
 # versions of the package
@@ -361,10 +377,6 @@ sed '1d' -i sphinx/pycode/pgen2/token.py
 
 # fix line encoding of bundled jquery.js
 dos2unix -k ./sphinx/themes/basic/static/jquery.js
-
-# In 1.5.2, the upstream tarball left this .pyc by mistake.
-# Remove it so that it doesn't get included in the python3 build by mistake
-rm sphinx/locale/__init__.pyc
 
 %if 0%{?with_python3}
 rm -rf %{py3dir}
@@ -582,6 +594,9 @@ popd
 
 
 %changelog
+* Thu Jul 20 2017 Charalampos Stratakis <cstratak@redhat.com> - - 1.6.3-1
+- Update to 1.6.3 (bz#1426928)
+
 * Sat Feb 18 2017 Toshio Kuratomi <toshio@fedoraproject.org> - - 1.5.2-2
 - Cleanup source files that should not be installed
 - Fix the __init__.pyc that was byte compiled for the wrong python
