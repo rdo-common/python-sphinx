@@ -15,7 +15,8 @@
 
 Name:       python-sphinx
 Version:    1.6.3
-Release:    2%{?dist}
+Release:    3%{?dist}
+Epoch:      1
 Summary:    Python documentation generator
 
 Group:      Development/Tools
@@ -168,7 +169,7 @@ the Python docs:
 
 %package -n    python2-sphinx
 Summary:       Python documentation generator
-Requires:      python-sphinx-locale = %{version}-%{release}
+Requires:      python-sphinx-locale = %{?epoch}:%{version}-%{release}
 Requires:      python2-babel
 Requires:      python-docutils
 Requires:      python-jinja2
@@ -190,12 +191,12 @@ Recommends:    graphviz
 Recommends:    ImageMagick
 Obsoletes:     python-sphinx <= 1.2.3
 Obsoletes:     python-sphinxcontrib-napoleon < 0.5
-Provides:      python-sphinxcontrib-napoleon = %{version}-%{release}
+Provides:      python-sphinxcontrib-napoleon = %{?epoch}:%{version}-%{release}
 Obsoletes:     python2-Sphinx <= 1.3.1-4
-Provides:      python2-Sphinx = %{version}-%{release}
-Provides:      python(Sphinx) = %{version}-%{release}
+Provides:      python2-Sphinx = %{?epoch}:%{version}-%{release}
+Provides:      python(Sphinx) = %{?epoch}:%{version}-%{release}
 %{?python_provide:%python_provide python2-sphinx}
-Conflicts:     python3-sphinx < %{version}-%{release}
+Conflicts:     python3-sphinx < %{?epoch}:%{version}-%{release}
 
 %description -n python2-sphinx
 Sphinx is a tool that makes it easy to create intelligent and
@@ -228,7 +229,7 @@ the Python docs:
 
 %package latex
 Summary:       LaTeX builder dependencies for %{name}
-Requires:      python(Sphinx) = %{version}-%{release}
+Requires:      python(Sphinx) = %{?epoch}:%{version}-%{release}
 Requires:      texlive-collection-fontsrecommended
 Requires:      texlive-collection-latex
 Requires:      texlive-dvipng
@@ -281,7 +282,7 @@ builder.
 %package -n python3-sphinx
 Summary:       Python documentation generator
 Group:         Development/Tools
-Requires:      python-sphinx-locale = %{version}-%{release}
+Requires:      python-sphinx-locale = %{?epoch}:%{version}-%{release}
 Requires:      python3-babel
 Requires:      python3-docutils
 Requires:      python3-jinja2
@@ -301,10 +302,10 @@ Requires: environment(modules)
 # versions of the package
 Requires(pre): /usr/sbin/alternatives
 Obsoletes:     python3-sphinxcontrib-napoleon < 0.3.0
-Provides:      python3-sphinxcontrib-napoleon = %{version}-%{release}
-Provides:      python(Sphinx) = %{version}-%{release}
+Provides:      python3-sphinxcontrib-napoleon = %{?epoch}:%{version}-%{release}
+Provides:      python(Sphinx) = %{?epoch}:%{version}-%{release}
 %{?python_provide:%python_provide python3-sphinx}
-Conflicts:     python2-Sphinx < %{version}-%{release}
+Conflicts:     python2-Sphinx < %{?epoch}:%{version}-%{release}
 
 %description -n python3-sphinx
 Sphinx is a tool that makes it easy to create intelligent and
@@ -340,7 +341,7 @@ the Python docs:
 Summary:       Documentation for %{name}
 Group:         Documentation
 License:       BSD
-Requires:      python(Sphinx) = %{version}-%{release}
+Requires:      python(Sphinx) = %{?epoch}:%{version}-%{release}
 
 %description doc
 Sphinx is a tool that makes it easy to create intelligent and
@@ -594,6 +595,9 @@ popd
 
 
 %changelog
+* Wed Sep 20 2017 Charalampos Stratakis <cstratak@redhat.com> - 1:1.6.3-3
+- Provide the epoch tag in order to keep the upgrade path clean.
+
 * Thu Jul 27 2017 Fedora Release Engineering <releng@fedoraproject.org> - 1.6.3-2
 - Rebuilt for https://fedoraproject.org/wiki/Fedora_27_Mass_Rebuild
 
