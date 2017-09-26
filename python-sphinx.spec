@@ -14,8 +14,8 @@
 %global upstream_name Sphinx
 
 Name:       python-sphinx
-Version:    1.6.3
-Release:    3%{?dist}
+Version:    1.6.4
+Release:    1%{?dist}
 Epoch:      1
 Summary:    Python documentation generator
 
@@ -595,6 +595,9 @@ popd
 
 
 %changelog
+* Tue Sep 26 2017 Charalampos Stratakis <cstratak@redhat.com> - 1:1.6.4-1
+- Update to 1.6.4 (bz#1426928)
+
 * Wed Sep 20 2017 Charalampos Stratakis <cstratak@redhat.com> - 1:1.6.3-3
 - Provide the epoch tag in order to keep the upgrade path clean.
 
