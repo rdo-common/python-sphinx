@@ -1,4 +1,4 @@
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?rhel} > 7
 %global with_python3 1
 %else
 %{!?python_sitelib: %global python_sitelib %(%{__python} -c "from distutils.sysconfig import get_python_lib; print (get_python_lib())")}
@@ -15,7 +15,7 @@
 
 Name:       python-sphinx
 Version:    1.6.4
-Release:    1%{?dist}
+Release:    2%{?dist}
 Epoch:      1
 Summary:    Python documentation generator
 
@@ -595,6 +595,9 @@ popd
 
 
 %changelog
+* Mon Oct 09 2017 Troy Dawson <tdawson@redhat.com> - 1:1.6.4-2
+- Cleanup spec file conditionals
+
 * Tue Sep 26 2017 Charalampos Stratakis <cstratak@redhat.com> - 1:1.6.4-1
 - Update to 1.6.4 (bz#1426928)
 
