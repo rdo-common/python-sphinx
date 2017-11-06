@@ -14,8 +14,8 @@
 %global upstream_name Sphinx
 
 Name:       python-sphinx
-Version:    1.6.4
-Release:    2%{?dist}
+Version:    1.6.5
+Release:    1%{?dist}
 Epoch:      1
 Summary:    Python documentation generator
 
@@ -595,6 +595,9 @@ popd
 
 
 %changelog
+* Mon Nov 06 2017 Charalampos Stratakis <cstratak@redhat.com> - 1:1.6.5-1
+- Update to 1.6.5 (bz#1508237)
+
 * Mon Oct 09 2017 Troy Dawson <tdawson@redhat.com> - 1:1.6.4-2
 - Cleanup spec file conditionals
 
